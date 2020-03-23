@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using APBD03.DAL;
 using APBD03.Models;
+using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -14,14 +15,33 @@ namespace APBD03.Controllers {
     [Route("api/students")]
     public class StudentsController : ControllerBase {
         private readonly IDbService dbService;
+        private List<Student> _students;
 
         public StudentsController(IDbService dbService) {
             this.dbService = dbService;
+            this._students = (List<Student>) dbService.GetStudents();
         }
 
         [HttpGet]
         public IActionResult GetStudents(string orderBy) {
-            return Ok(dbService.GetStudents());
+            string connectionString = "Data Source=db-mssql16.pjwstk.edu.pl;Initial Catalog=s18968;User ID=inzs18968;Password=admin123";
+
+            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand()) {
+                command.Connection = connection;
+                command.CommandText = "select * from Student";
+
+                connection.Open();
+                var dr = command.ExecuteReader();
+                while (dr.Read()) {
+                    var student = new Student {
+                        FirstName = dr["FirstName"].ToString(),
+                        LastName = dr["LastName"].ToString(),
+                    };
+                    _students.Add(student);
+                }
+                return Ok(_students);
+            }
         }
 
         [HttpGet("{id}")]

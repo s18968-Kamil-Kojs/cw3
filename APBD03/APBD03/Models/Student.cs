@@ -10,7 +10,7 @@ namespace APBD03.Models {
         public string IndexNumber { get; set; }
 
         public Student() {
-
+        
         }
     }
 }
