@@ -2,11 +2,10 @@
 namespace APBD03.Models {
 
     public class Enrollment {
-        public string IndexNumber { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string BirthDate { get; set; }
-        public string Studies { get; set; }
+        public string IdEnrollment { get; set; }
+        public string Semester { get; set; }
+        public string IdStudy { get; set; }
+        public string StartDate { get; set; }
 
         public Enrollment() {
         }

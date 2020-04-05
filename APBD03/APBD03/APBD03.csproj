@@ -9,6 +9,10 @@
     <Folder Include="Controllers\" />
     <Folder Include="Models\" />
     <Folder Include="DAL\" />
+    <Folder Include="DTOs\" />
+    <Folder Include="DTOs\Requests\" />
+    <Folder Include="DTOs\Responses\" />
+    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Controllers\WeatherForecastController.cs" />
