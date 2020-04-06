@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using APBD03.DAL;
+using APBD03.Middlewares;
 using APBD03.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +40,38 @@ namespace APBD03 {
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseMiddleware<LoggingMiddleware>();
+
+            app.Use(async (context, next) => {
+                if (!context.Request.Headers.ContainsKey("Index")) {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await context.Response.WriteAsync("Nie podałeś indeksu");
+                    return;
+                }
+
+                string index = context.Request.Headers["Index"].ToString();
+                //check in db
+                string connectionString = "Data Source=db-mssql16.pjwstk.edu.pl;Initial Catalog=s18968;User ID=inzs18968;Password=admin123";
+
+                using (var connection = new SqlConnection(connectionString))
+                using (var command = new SqlCommand()) {
+                    command.Connection = connection;
+                    connection.Open();
+                   
+                    //Check if student exists
+                    command.CommandText = "select * from Student where IndexNumber="+index;
+
+                    var dr = command.ExecuteReader();
+                    if (!dr.Read()) {
+                        await context.Response.WriteAsync("Student o podanym indeksie nie istnieje");
+                        return;
+                    }
+                }
+
+
+                await next();
+            });
 
             app.UseAuthorization();
 

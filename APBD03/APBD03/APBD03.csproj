@@ -13,6 +13,7 @@
     <Folder Include="DTOs\Requests\" />
     <Folder Include="DTOs\Responses\" />
     <Folder Include="Services\" />
+    <Folder Include="Middlewares\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Controllers\WeatherForecastController.cs" />
