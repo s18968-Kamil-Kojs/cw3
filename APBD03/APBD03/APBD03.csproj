@@ -14,11 +14,13 @@
     <Folder Include="DTOs\Responses\" />
     <Folder Include="Services\" />
     <Folder Include="Middlewares\" />
+    <Folder Include="Handlers\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Controllers\WeatherForecastController.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.3" />
   </ItemGroup>
 </Project>
