@@ -6,6 +6,12 @@ using APBD03.DAL;
 using APBD03.Models;
 using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Configuration;
+using System.IdentityModel.Tokens.Jwt;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,17 +19,20 @@ namespace APBD03.Controllers {
 
     [ApiController]
     [Route("api/students")]
-    public class StudentsController : ControllerBase {
+    public class StudentsController :ControllerBase {
         private readonly IDbService dbService;
         private ICollection<Student> _students;
+        public IConfiguration Configuration { get; set; }
         string connectionString = "Data Source=db-mssql16.pjwstk.edu.pl;Initial Catalog=s18968;User ID=inzs18968;Password=admin123";
 
-        public StudentsController(IDbService dbService) {
+        public StudentsController(IDbService dbService, IConfiguration configuration) {
             this.dbService = dbService;
             this._students = (List<Student>) dbService.GetStudents();
+            this.Configuration = configuration;
         }
 
         [HttpGet]
+        //[Authorize] 
         public IActionResult GetStudents(string orderBy) {
 
             using (var connection = new SqlConnection(connectionString))
@@ -86,6 +95,32 @@ namespace APBD03.Controllers {
         [HttpDelete("{id}")]
         public IActionResult DeleteStudent(int id) {
             return Ok(200 + " Usuwanie dokonczone");
+        }
+
+        [HttpGet]
+        public IActionResult Login() {
+            var claims = new[] {
+                new Claim(ClaimTypes.NameIdentifier, "1"),
+                new Claim(ClaimTypes.Name, "jan123"),
+                new Claim(ClaimTypes.Role, "admin"),
+                new Claim(ClaimTypes.Role, "student"),
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecretKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken (
+                issuer: "Gakko",
+                audience: "Students",
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(10),
+                signingCredentials: creds
+            );
+
+            return Ok(new{
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                refreshToken=Guid.NewGuid()
+            });
         }
     }
 }

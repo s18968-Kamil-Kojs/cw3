@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using APBD03.DTOs.Requests;
 using APBD03.Models;
 using APBD03.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace APBD03.DAL {
     public class SqlServerStudentDbService : IStudentDbService{
@@ -14,6 +19,7 @@ namespace APBD03.DAL {
 
         }
 
+        [Authorize(Roles = "employee")]
         public string enrollStudent(EnrollStudentRequest request) {
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand()) {
@@ -85,6 +91,7 @@ namespace APBD03.DAL {
             }
         }
 
+        [Authorize(Roles = "employee")]
         public List<Enrollment> promoteStudents(PromoteStudentsRequest request) {
             List<Enrollment> list = new List<Enrollment>();
             using (var connection = new SqlConnection(connectionString))
@@ -115,5 +122,7 @@ namespace APBD03.DAL {
             }
             return list;
         }
+
+        
     }
 }
